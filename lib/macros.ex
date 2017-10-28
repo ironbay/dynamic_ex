@@ -31,6 +31,7 @@ end
 defmodule Dynamic.Example do
 	import Dynamic.Macros
 
-	get :patient
-	get :nice
+	get :a
+	get :b
+
 end
