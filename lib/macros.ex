@@ -1,10 +1,20 @@
 defmodule Dynamic.Macros do
 
+	defmacro get(funs) when is_list(funs) do
+		funs
+		|> Enum.map(fn fun ->
+			quote do
+				get(unquote(fun))
+			end
+		end)
+	end
+
 	defmacro get(fun) do
 		quote do
 			get(unquote(fun), Atom.to_string(unquote(fun)))
 		end
 	end
+
 	defmacro get(fun, path) do
 		quote do
 			get(unquote(fun), unquote(path), &(&1))
@@ -31,7 +41,9 @@ end
 defmodule Dynamic.Example do
 	import Dynamic.Macros
 
-	get :a
-	get :b
+	get [
+		:a,
+		:b
+	]
 
 end
