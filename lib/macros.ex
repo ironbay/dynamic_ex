@@ -15,6 +15,12 @@ defmodule Dynamic.Macros do
 		end
 	end
 
+	defmacro get(fun, cb) when is_function(cb) do
+		quote do
+			get(unquote(fun), Atom.to_string(unquote(fun)), unquote(cb))
+		end
+	end
+
 	defmacro get(fun, path) do
 		quote do
 			get(unquote(fun), unquote(path), &(&1))
