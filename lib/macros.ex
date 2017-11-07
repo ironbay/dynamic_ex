@@ -1,5 +1,4 @@
 defmodule Dynamic.Macros do
-
 	defmacro get(funs) when is_list(funs) do
 		funs
 		|> Enum.map(fn fun ->
@@ -32,6 +31,7 @@ defmodule Dynamic.Macros do
 			get(unquote(fun), [unquote(path)], unquote(cb))
 		end
 	end
+
 	defmacro get(fun, path, cb) do
 		quote do
 			def unquote(fun)(input) do
@@ -42,14 +42,31 @@ defmodule Dynamic.Macros do
 			end
 		end
 	end
+
+	defmacro __using__(_opts) do
+		quote do
+			import Dynamic.Macros
+
+			def pull(input, fields) do
+				IO.inspect(__MODULE__)
+				fields
+				|> Enum.map(&apply(__MODULE__, &1, [input]))
+			end
+		end
+	end
 end
 
 defmodule Dynamic.Example do
-	import Dynamic.Macros
+	use Dynamic.Macros
 
-	get [
-		:a,
-		:b
-	]
+	get :key
+	get :nice
+
+	@sample %{"key" => "key", "nice" => "nice"}
+
+
+	def test do
+		[key, nice] = Dynamic.Example.pull(@sample, [:key, :nice])
+	end
 
 end
