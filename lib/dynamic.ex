@@ -123,15 +123,4 @@ defmodule Dynamic do
 	def atom_keys(input), do: for {key, val} <- input, into: %{}, do: {String.to_atom(key), val}
 	def string_keys(input), do: for {key, val} <- input, into: %{}, do: {Atom.to_string(key), val}
 
-	def diff(old, new) do
-		old
-		|> Dynamic.flatten
-		|> Enum.reduce(new, fn {path, value}, collect ->
-			cond do
-				Dynamic.get(new, path) === value -> Dynamic.delete(collect, path)
-				true -> collect
-			end
-		end)
-	end
-
 end
