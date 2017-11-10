@@ -48,7 +48,6 @@ defmodule Dynamic.Macros do
 			import Dynamic.Macros
 
 			def pull(input, fields) do
-				IO.inspect(__MODULE__)
 				fields
 				|> Enum.map(&apply(__MODULE__, &1, [input]))
 			end
