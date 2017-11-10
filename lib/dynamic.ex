@@ -80,11 +80,7 @@ defmodule Dynamic do
 	def delete(input, [head]), do: Map.delete(input, head)
 	def delete(input, [head | tail]) do
 		case Map.get(input, head) do
-			result when is_map(result) ->
-				case delete(result, tail) do
-					result when result === %{} -> Map.delete(input, head)
-					result -> Map.put(input, head, result)
-				end
+			result when is_map(result) -> Map.put(input, head, delete(result, tail))
 			_ -> input
 		end
 	end
