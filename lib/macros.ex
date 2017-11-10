@@ -64,7 +64,6 @@ defmodule Dynamic.Example do
 
 	@sample %{"key" => "key", "nice" => "nice"}
 
-
 	def test do
 		[key, nice] = Dynamic.Example.pull(@sample, [:key, :nice])
 	end

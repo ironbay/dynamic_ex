@@ -80,7 +80,11 @@ defmodule Dynamic do
 	def delete(input, [head]), do: Map.delete(input, head)
 	def delete(input, [head | tail]) do
 		case Map.get(input, head) do
-			result when is_map(result) -> Map.put(input, head, delete(result, tail))
+			result when is_map(result) ->
+				case delete(result, tail) do
+					result when result === %{} -> Map.delete(input, head)
+					result -> Map.put(input, head, result)
+				end
 			_ -> input
 		end
 	end
@@ -118,5 +122,16 @@ defmodule Dynamic do
 
 	def atom_keys(input), do: for {key, val} <- input, into: %{}, do: {String.to_atom(key), val}
 	def string_keys(input), do: for {key, val} <- input, into: %{}, do: {Atom.to_string(key), val}
+
+	def diff(old, new) do
+		old
+		|> Dynamic.flatten
+		|> Enum.reduce(new, fn {path, value}, collect ->
+			cond do
+				Dynamic.get(new, path) === value -> Dynamic.delete(collect, path)
+				true -> collect
+			end
+		end)
+	end
 
 end
