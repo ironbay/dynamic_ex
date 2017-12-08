@@ -7,12 +7,12 @@ defmodule Dynamic do
 
 	def get(input, [head], fallback, compare) do
 		input
-		|> Map.get(head)
+		|> Access.get(head)
 		|> default(fallback, compare)
 	end
 
 	def get(input, [head | tail], fallback, compare) do
-		case Map.get(input, head) do
+		case Access.get(input, head) do
 			result when is_map(result) ->
 				get(result, tail, fallback, compare)
 			_ -> fallback
@@ -67,20 +67,20 @@ defmodule Dynamic do
 		iex> Kora.Dynamic.default(:foo, :bar, :boo)
 		:foo
 	"""
-	def put(input, [head], value), do: Map.put(input, head, value)
+	def put(input, [head], value), do: Kernel.put_in(input, [head], value)
 	def put(input, [head | tail], value) do
 		child =
-			case Map.get(input, head) do
+			case Access.get(input, head) do
 				result when is_map(result) -> result
 				_ -> %{}
 			end
-		Map.put(input, head, put(child, tail, value))
+		Kernel.put(input, [head], put(child, tail, value))
 	end
 
 	def delete(input, [head]), do: Map.delete(input, head)
 	def delete(input, [head | tail]) do
 		case Map.get(input, head) do
-			result when is_map(result) -> Map.put(input, head, delete(result, tail))
+			result when is_map(result) -> put(input, [head], delete(result, tail))
 			_ -> input
 		end
 	end
