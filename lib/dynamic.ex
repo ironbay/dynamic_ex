@@ -18,6 +18,7 @@ defmodule Dynamic do
 			_ -> fallback
 		end
 	end
+
 	@doc ~S"""
 	Gets value at path or falls back
 	## Examples
@@ -27,6 +28,7 @@ defmodule Dynamic do
 	def get(input, path) do
 		get(input, path, nil, nil)
 	end
+
 	@doc ~S"""
 	Gets value at path or falls back
 	## Examples
@@ -45,27 +47,15 @@ defmodule Dynamic do
 	"""
 	def default(input, fallback), do: default(input, fallback, nil)
 
-	@doc ~S"""
-	Default to fallback if input is equal to compare
-	## Examples
-		iex> Dynamic.default(:bar, :foo, :bar)
-		:foo
-	"""
 	def default(input, fallback, compare) when input == compare, do: fallback
 
-	@doc ~S"""
-	Defaults to input if not equal to compare
-	## Examples
-		iex> Dynamic.default(:foo, :bar, :boo)
-		:foo
-	"""
 	def default(input, _compare, _default), do: input
 
 	@doc ~S"""
-	Defaults to input if not equal to compare
+	Set the value at the given path
 	## Examples
-		iex> Dynamic.default(:foo, :bar, :boo)
-		:foo
+		iex> Dynamic.put(%{}, [:a, :b, :c], :foo)
+		%{a: %{b: %{c: :foo}}}
 	"""
 	def put(input, [head], value), do: Kernel.put_in(input, [head], value)
 	def put(input, [head | tail], value) do
@@ -74,12 +64,21 @@ defmodule Dynamic do
 				result when is_map(result) -> result
 				_ -> %{}
 			end
-		Kernel.put(input, [head], put(child, tail, value))
+		put(input, [head], put(child, tail, value))
 	end
 
-	def delete(input, [head]), do: Map.delete(input, head)
+	@doc ~S"""
+	Delete the value at the given path
+	## Examples
+		iex> Dynamic.put(%{}, [:a, :b, :c], :foo)
+		%{a: %{b: %{c: :foo}}}
+	"""
+	def delete(input, [head]) do
+		{_, result} = Kernel.pop_in(input, [head])
+		result
+	end
 	def delete(input, [head | tail]) do
-		case Map.get(input, head) do
+		case Access.get(input, head) do
 			result when is_map(result) -> put(input, [head], delete(result, tail))
 			_ -> input
 		end
