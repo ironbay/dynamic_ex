@@ -13,6 +13,18 @@ defmodule DynamicTest do
     assert Dynamic.get(input, [:a, :c, :d], 5) === 5
   end
 
+  test "get_list" do
+    input = %{
+      a: %{
+        b: [3, 4, [%{ "deep" => true }]]
+      }
+    }
+    assert Dynamic.get(input, [:a, :b, 0]) === 3
+    assert Dynamic.get(input, [:a, :b, 3], 5) === 5
+    assert Dynamic.get(input, [:a, :b, 2, 0, "deep"]) === true
+  end
+
+
   test "put" do
     expected = %{}
     assert Dynamic.put(%{}, [:a, :b], 1) === %{a: %{b: 1}}
