@@ -25,15 +25,29 @@ defmodule Dynamic do
         |> default(fallback, compare)
     end
 
+    defp get(input, [head], fallback, compare) when is_list(input) and is_integer(head) do
+        input 
+        |> Enum.at(head)
+        |> default(fallback, compare)
+    end
+
     defp get(input, [head], fallback, compare) do
         input
         |> Access.get(head)
         |> default(fallback, compare)
     end
 
+    defp get(input, [head | tail], fallback, compare)when is_list(input) and is_integer(head) do
+        case Enum.at(input, head) do
+            result when is_map(result) or is_list(result) ->
+                get(result, tail, fallback, compare)
+            _ -> fallback
+        end
+    end
+
     defp get(input, [head | tail], fallback, compare) do
         case Access.get(input, head) do
-            result when is_map(result) ->
+            result when is_map(result) or is_list(result) ->
                 get(result, tail, fallback, compare)
             _ -> fallback
         end
